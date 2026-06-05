@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>אלף-בית הגיבורים 🦁</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Varela+Round&display=swap');
+
+:root {
+  --radius: 22px;
+  --gold: #f5a623;
+  --green: #43a047;
+  --red: #e53935;
+  --blue: #1e88e5;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Varela Round', sans-serif;
+  min-height: 100vh;
+  color: #2d2d2d;
+  overflow-x: hidden;
+}
+
+/* ══════════════════════════════════════
+   SCREEN THEMING — each screen has a color theme
+══════════════════════════════════════ */
+body.theme-1 { background: #fff9f0; }
+body.theme-2 { background: #f0f8ff; }
+
+body.theme-1 header { background: linear-gradient(135deg,#ff8f00,#e65100); }
+body.theme-2 header { background: linear-gradient(135deg,#0277bd,#01579b); }
+
+body.theme-1 .pictures-panel { background: #ffecd2; border-color: #d4c5b0; }
+body.theme-2 .pictures-panel { background: #dceefb; border-color: #90caf9; }
+
+body.theme-1 .letters-panel { background: #e8f5e9; border-color: #b8ddb8; }
+body.theme-2 .letters-panel { background: #e8f5e9; border-color: #b8ddb8; }
+
+body.theme-1 .pic-card  { background: #fff; border-color: #e0cfa8; }
+body.theme-2 .pic-card  { background: #fff; border-color: #90caf9; }
+
+body.theme-1 .letter-tile { background: #fff; border-color: #a5d6a7; }
+body.theme-2 .letter-tile { background: #fff; border-color: #81d4fa; }
+
+/* ── HEADER ── */
+header {
+  padding: 14px 22px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 18px rgba(0,0,0,.2);
+  position: sticky; top: 0; z-index: 50;
+}
+.logo-text {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.5rem;
+  color: #fff;
+}
+.header-right { display: flex; gap: 10px; align-items: center; }
+.chip {
+  background: rgba(255,255,255,0.22);
+  border-radius: 30px;
+  padding: 6px 16px;
+  font-size: 0.9rem;
+  color: #fff;
+  font-weight: 700;
+  display: flex; align-items: center; gap: 6px;
+}
+.chip span { font-size: 1.2rem; }
+
+/* ── INSTRUCTIONS ── */
+.instructions {
+  text-align: center;
+  padding: 10px 16px 4px;
+  font-size: 1rem;
+  color: #5d4037;
+  font-weight: 700;
+}
+.instructions em { color: var(--blue); font-style: normal; }
+
+/* ── PROGRESS BAR ── */
+.progress-wrap {
+  max-width: 980px; margin: 8px auto 0; padding: 0 16px;
+}
+.prog-label { display: flex; justify-content: space-between; font-size: 0.82rem; color: #888; margin-bottom: 3px; }
+.prog-bar-bg { background: #e0e0e0; border-radius: 20px; height: 12px; overflow: hidden; }
+.prog-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg,#43a047,#76c442);
+  border-radius: 20px;
+  transition: width .4s ease;
+}
+
+/* ── ARENA ── */
+.arena {
+  display: grid;
+  grid-template-columns: 1fr 44px 1fr;
+  gap: 0;
+  max-width: 980px;
+  margin: 10px auto 0;
+  padding: 0 14px;
+  align-items: start;
+}
+.panel-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.15rem;
+  text-align: center;
+  margin-bottom: 12px;
+}
+body.theme-1 .panel-title { color: #5d4037; }
+body.theme-2 .panel-title { color: #01579b; }
+
+.pictures-panel, .letters-panel {
+  border: 2.5px solid;
+  border-radius: var(--radius);
+  padding: 16px 12px;
+  min-height: 480px;
+}
+
+/* ── PIC GRID ── */
+.pic-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.pic-card {
+  border: 2.5px solid;
+  border-radius: 16px;
+  padding: 8px 6px 6px;
+  text-align: center;
+  position: relative;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 3px;
+  min-height: 100px;
+  transition: border-color .2s, background .2s;
+}
+.pic-card.correct-all { border-color: var(--green) !important; background: #f1f8e9 !important; animation: pop .35s; }
+.pic-card.card-hover  { border-color: var(--blue) !important; background: #e8f4ff !important; transform: scale(1.03); }
+@keyframes pop { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+.pic-drawing { font-size: 2.8rem; line-height: 1; pointer-events: none; user-select: none; }
+.pic-name { font-family: 'Fredoka One', cursive; font-size: 0.9rem; color: #5d4037; }
+.drop-zone-row { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; margin-top: 3px; }
+.drop-slot {
+  width: 38px; height: 38px;
+  border: 2.5px dashed #bbb;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.5rem;
+  background: #f9f9f9;
+  transition: all .2s;
+  position: relative;
+  cursor: pointer;
+}
+.drop-slot.drag-over { border-color: var(--blue); background: #e3f2fd; transform: scale(1.12); }
+.drop-slot.correct   { border-color: var(--green); background: #e8f5e9; color: var(--green); cursor: default; }
+.drop-slot.wrong     { border-color: var(--red); background: #ffebee; animation: shake .35s; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+.star-badge {
+  position: absolute; top: -10px; right: -10px;
+  font-size: 1.2rem;
+  animation: starPop .4s ease-out;
+  pointer-events: none;
+}
+@keyframes starPop { 0%{transform:scale(0) rotate(-30deg)} 100%{transform:scale(1) rotate(0deg)} }
+
+/* ── DIVIDER ── */
+.divider {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 6px;
+  padding-top: 50px; color: #bbb; font-size: 1.4rem;
+}
+
+/* ── LETTERS BANK ── */
+.letters-bank {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.letter-tile {
+  border: 2.5px solid;
+  border-radius: 14px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 1px; padding: 8px 4px 6px;
+  cursor: grab; user-select: none;
+  transition: all .18s;
+}
+.letter-tile:active { cursor: grabbing; }
+.letter-tile:hover:not(.used) {
+  transform: translateY(-4px) scale(1.07);
+  box-shadow: 0 8px 22px rgba(0,0,0,.13);
+  border-color: var(--gold) !important;
+}
+.letter-tile.used { opacity: 0.28; cursor: not-allowed; pointer-events: none; }
+.letter-tile.dragging { opacity: 0.45; transform: scale(1.1) rotate(-3deg); }
+.tile-heb { font-family: 'Fredoka One', cursive; font-size: 2rem; color: #2e7d32; line-height: 1; }
+.tile-name { font-size: 0.6rem; color: #666; }
+
+/* ── DRAG GHOST ── */
+#dragGhost {
+  position: fixed; pointer-events: none; z-index: 9999;
+  font-family: 'Fredoka One', cursive; font-size: 2.2rem;
+  background: #fff; border: 3px solid var(--gold);
+  border-radius: 14px; padding: 6px 12px;
+  box-shadow: 0 8px 28px rgba(0,0,0,.22);
+  transform: translate(-50%,-50%); display: none; color: #2e7d32;
+}
+
+/* ══════════════════════════════════════
+   WIN ANIMATION OVERLAY
+══════════════════════════════════════ */
+#winOverlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.6);
+  z-index: 300;
+  align-items: center; justify-content: center;
+  flex-direction: column;
+}
+#winOverlay.show { display: flex; }
+
+.win-character {
+  font-size: 9rem;
+  animation: characterBounce 0.7s cubic-bezier(.36,.07,.19,.97) both;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,.3));
+  margin-bottom: -10px;
+}
+@keyframes characterBounce {
+  0%   { transform: scale(0) translateY(80px); opacity: 0; }
+  60%  { transform: scale(1.15) translateY(-20px); opacity: 1; }
+  80%  { transform: scale(0.95) translateY(5px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+.win-box {
+  background: linear-gradient(135deg,#fff9c4,#fff3e0);
+  border: 4px solid var(--gold);
+  border-radius: 28px;
+  padding: 30px 44px 36px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,.3);
+  animation: boxSlideUp .5s .3s both;
+  max-width: 400px; width: 90%;
+}
+@keyframes boxSlideUp {
+  0%   { transform: translateY(40px); opacity: 0; }
+  100% { transform: translateY(0);    opacity: 1; }
+}
+.win-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 2.2rem; color: #e65100;
+  margin: 4px 0 6px;
+}
+.win-stars { font-size: 2.4rem; letter-spacing: 6px; margin-bottom: 10px; }
+.win-msg { font-size: 1rem; color: #5d4037; margin-bottom: 20px; line-height: 1.5; }
+.win-speech {
+  background: rgba(255,255,255,.7);
+  border-radius: 14px;
+  padding: 10px 16px;
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 16px;
+  font-style: italic;
+}
+.btn-continue {
+  background: linear-gradient(135deg,#ff8f00,#e65100);
+  color: #fff; border: none; border-radius: 50px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.15rem; padding: 13px 36px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(230,81,0,.4);
+  transition: transform .2s;
+  margin-left: 10px;
+}
+.btn-continue:hover { transform: scale(1.05); }
+.btn-retry {
+  background: #fff; color: #e65100;
+  border: 2.5px solid #e65100; border-radius: 50px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem; padding: 11px 28px;
+  cursor: pointer; transition: background .2s;
+}
+.btn-retry:hover { background: #fff3e0; }
+
+/* ── FINAL COMPLETE OVERLAY ── */
+#finalOverlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: linear-gradient(135deg,#1a237e,#4a148c,#880e4f);
+  z-index: 400;
+  align-items: center; justify-content: center;
+  flex-direction: column;
+}
+#finalOverlay.show { display: flex; animation: fadeIn .6s; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.final-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 3rem; color: #FFD700;
+  text-shadow: 0 0 30px rgba(255,215,0,.6);
+  margin-bottom: 8px; text-align: center;
+}
+.final-subtitle { color: rgba(255,255,255,.85); font-size: 1.1rem; text-align: center; margin-bottom: 20px; }
+.final-letters {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 8px; max-width: 500px; margin-bottom: 28px;
+}
+.final-letter-chip {
+  background: rgba(255,255,255,.15);
+  border: 2px solid rgba(255,255,255,.3);
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.8rem; color: #FFD700;
+  animation: chipPop .4s ease-out both;
+}
+@keyframes chipPop { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+.btn-restart {
+  background: linear-gradient(135deg,#FFD700,#ff8f00);
+  color: #1a237e; border: none; border-radius: 50px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.2rem; padding: 14px 40px;
+  cursor: pointer; box-shadow: 0 6px 24px rgba(255,215,0,.4);
+  transition: transform .2s;
+}
+.btn-restart:hover { transform: scale(1.06); }
+
+/* ── CONFETTI ── */
+.confetti {
+  position: fixed; font-size: 1.6rem;
+  pointer-events: none; z-index: 9998;
+  animation: confettiFly 1.6s ease-out forwards;
+}
+@keyframes confettiFly {
+  0%   { opacity:1; transform: translateY(0) rotate(0deg) scale(1); }
+  100% { opacity:0; transform: translateY(-280px) rotate(540deg) scale(.3); }
+}
+
+/* ── SCREEN COUNTER ── */
+.screen-dots {
+  display: flex; gap: 8px; justify-content: center;
+  padding: 10px 0 2px;
+}
+.dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #ddd; transition: background .3s;
+}
+.dot.active { background: var(--gold); }
+.dot.done   { background: var(--green); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 680px) {
+  .arena { grid-template-columns: 1fr; gap: 12px; }
+  .divider { display: none; }
+  .pic-grid { grid-template-columns: repeat(3,1fr); }
+  .letters-bank { grid-template-columns: repeat(4,1fr); }
+  .win-box { padding: 22px 22px 26px; }
+  .win-title { font-size: 1.7rem; }
+}
+</style>
+</head>
+<body class="theme-1">
+
+<header>
+  <div class="logo-text" id="headerLogo">🦁 אלף-בית הגיבורים</div>
+  <div class="header-right">
+    <div class="chip" id="screenLabel"><span>📄</span> מסך 1 מתוך 2</div>
+    <div class="chip"><span>⭐</span><span id="scoreNum">0</span></div>
+  </div>
+</header>
+
+<div class="screen-dots" id="screenDots"></div>
+
+<div class="instructions">
+  גרור אות 🔡 ושחרר על הציור שמתחיל בה! <em>יכולות להיות כמה תשובות נכונות.</em>
+</div>
+
+<div class="progress-wrap">
+  <div class="prog-label">
+    <span id="progLabel">התקדמות במסך</span>
+    <span id="progText">0 / 0</span>
+  </div>
+  <div class="prog-bar-bg"><div class="prog-bar-fill" id="progFill" style="width:0%"></div></div>
+</div>
+
+<div class="arena">
+  <div class="pictures-panel">
+    <div class="panel-title">🖼️ הציורים</div>
+    <div class="pic-grid" id="picGrid"></div>
+  </div>
+  <div class="divider">⬅<br>➡</div>
+  <div class="letters-panel">
+    <div class="panel-title">🔡 האותיות</div>
+    <div class="letters-bank" id="lettersBank"></div>
+  </div>
+</div>
+
+<div id="dragGhost"></div>
+
+<!-- WIN OVERLAY (per screen) -->
+<div id="winOverlay">
+  <div class="win-character" id="winCharacter"></div>
+  <div class="win-box">
+    <div class="win-stars" id="winStars">⭐⭐⭐</div>
+    <div class="win-title" id="winTitle">כל הכבוד!</div>
+    <div class="win-speech" id="winSpeech"></div>
+    <div class="win-msg" id="winMsg"></div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-retry" onclick="retryScreen()">🔄 עוד פעם</button>
+      <button class="btn-continue" id="btnContinue" onclick="nextScreen()">המשך ←</button>
+    </div>
+  </div>
+</div>
+
+<!-- FINAL OVERLAY -->
+<div id="finalOverlay">
+  <div style="font-size:5rem;margin-bottom:8px;">🏆</div>
+  <div class="final-title">סיימת את כל האותיות!</div>
+  <div class="final-subtitle">למדת את כל 22 האותיות של האלף-בית העברי 🎉</div>
+  <div class="final-letters" id="finalLetters"></div>
+  <button class="btn-restart" onclick="restartAll()">🔄 מתחילים שוב מהתחלה</button>
+</div>
+
+<script>
+/* ════════════════════════════════════════
+   ALL SCREENS DATA
+   Each screen: { theme, logo, pictures[] }
+   Each picture: { emoji, name, letters:[{heb,name}] }
+════════════════════════════════════════ */
+const SCREENS = [
+  {
+    theme: 'theme-1',
+    logo: '🦁 חיות וטבע',
+    character: { emoji:'🦁', speech:'כל הכבוד! למדת 12 אותיות! אני גאה בך!' },
+    pictures: [
+      { emoji:'🦁', name:'אריה',     letters:[{heb:'א',name:'אלף'}] },
+      { emoji:'🐝', name:'דבורה',    letters:[{heb:'ד',name:'דלת'}] },
+      { emoji:'🐯', name:'טיגריס',   letters:[{heb:'ט',name:'טית'}] },
+      { emoji:'🐍', name:'נחש',      letters:[{heb:'נ',name:'נון'}] },
+      { emoji:'🐋', name:'לוויתן',   letters:[{heb:'ל',name:'למד'}] },
+      { emoji:'🍇', name:'ענבים',    letters:[{heb:'ע',name:'עין'}] },
+      { emoji:'🐘', name:'פיל',      letters:[{heb:'פ',name:'פא'}] },
+      { emoji:'🦒', name:'גירפה',    letters:[{heb:'ג',name:'גימל'}] },
+      { emoji:'🛸', name:'חללית',    letters:[{heb:'ח',name:'חית'}] },
+      { emoji:'🌞', name:'שמש',      letters:[{heb:'ש',name:'שין'}] },
+      { emoji:'🐉', name:'דרקון',    letters:[{heb:'ד',name:'דלת'}] },
+      { emoji:'🥷', name:'נינג\'ה',  letters:[{heb:'נ',name:'נון'}] },
+    ]
+  },
+  {
+    theme: 'theme-2',
+    logo: '🌊 ים, אוכל ותחבורה',
+    character: { emoji:'🐬', speech:'וואו! סיימת את כל 22 האותיות! אתה אלוף!' },
+    pictures: [
+      { emoji:'🦈', name:'כריש',     letters:[{heb:'כ',name:'כף'}] },
+      { emoji:'🐬', name:'דולפין',   letters:[{heb:'ד',name:'דלת'}] },
+      { emoji:'🍕', name:'פיצה',     letters:[{heb:'פ',name:'פא'}] },
+      { emoji:'🍌', name:'בננה',     letters:[{heb:'ב',name:'בית'}] },
+      { emoji:'🌹', name:'ורד',      letters:[{heb:'ו',name:'וו'}] },
+      { emoji:'🚂', name:'רכבת',     letters:[{heb:'ר',name:'ריש'}] },
+      { emoji:'🚁', name:'מסוק',     letters:[{heb:'מ',name:'מם'}] },
+      { emoji:'⛵', name:'סירה',     letters:[{heb:'ס',name:'סמך'}] },
+      { emoji:'🌲', name:'עץ',       letters:[{heb:'ע',name:'עין'}] },
+      { emoji:'🦋', name:'פרפר',     letters:[{heb:'פ',name:'פא'}] },
+      { emoji:'🐢', name:'צב',       letters:[{heb:'צ',name:'צדי'}] },
+      { emoji:'🌺', name:'קיפוד',    letters:[{heb:'ק',name:'קוף'}] },
+    ]
+  }
+];
+
+/* Distractor letters per screen */
+const DISTRACTORS = [
+  [ // screen 1 distractors
+    {heb:'ב',name:'בית'},{heb:'ה',name:'הא'},{heb:'ו',name:'וו'},
+    {heb:'ז',name:'זין'},{heb:'י',name:'יוד'},{heb:'כ',name:'כף'},
+    {heb:'מ',name:'מם'},{heb:'ס',name:'סמך'},{heb:'צ',name:'צדי'},
+    {heb:'ק',name:'קוף'},{heb:'ר',name:'ריש'},{heb:'ת',name:'תו'},
+  ],
+  [ // screen 2 distractors
+    {heb:'א',name:'אלף'},{heb:'ג',name:'גימל'},{heb:'ה',name:'הא'},
+    {heb:'ז',name:'זין'},{heb:'ח',name:'חית'},{heb:'ט',name:'טית'},
+    {heb:'י',name:'יוד'},{heb:'ל',name:'למד'},{heb:'נ',name:'נון'},
+    {heb:'ש',name:'שין'},{heb:'ת',name:'תו'}, {heb:'ד',name:'דלת'},
+  ]
+];
+
+/* ════════════════════════════════════
+   STATE
+════════════════════════════════════ */
+let currentScreen = 0;
+let score = 0;
+let totalSlots = 0;
+let filledCorrect = 0;
+let allTiles = [];
+let dragLetter = null;
+let dragTileEl = null;
+let screenScores = [0, 0];
+
+/* ════════════════════════════════════
+   UTILS
+════════════════════════════════════ */
+function shuffle(arr) {
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+/* ════════════════════════════════════
+   INIT SCREEN
+════════════════════════════════════ */
+function initScreen(idx) {
+  currentScreen = idx;
+  filledCorrect = 0;
+  totalSlots = 0;
+  dragLetter = null;
+  dragTileEl = null;
+
+  const screen = SCREENS[idx];
+
+  // Theme
+  document.body.className = screen.theme;
+
+  // Header
+  document.getElementById('headerLogo').textContent = screen.logo;
+  document.getElementById('screenLabel').innerHTML =
+    `<span>📄</span> מסך ${idx+1} מתוך ${SCREENS.length}`;
+
+  // Dots
+  buildDots();
+
+  // Build tile bank
+  const letterCount = {};
+  screen.pictures.forEach(p => p.letters.forEach(l => {
+    if (!letterCount[l.heb]) letterCount[l.heb] = { heb:l.heb, name:l.name, count:0 };
+    letterCount[l.heb].count++;
+  }));
+
+  allTiles = [];
+  Object.values(letterCount).forEach(l => {
+    for(let i=0;i<l.count;i++) allTiles.push({heb:l.heb, name:l.name, tileId:`${l.heb}_${i}`});
+  });
+
+  const dist = DISTRACTORS[idx] || [];
+  dist.forEach((d, di) => {
+    if (!letterCount[d.heb]) allTiles.push({...d, tileId:`dist_${di}`});
+  });
+  allTiles = shuffle(allTiles);
+
+  buildPictures();
+  buildLetters();
+  updateProgress();
+  updateScore();
+}
+
+/* ════════════════════════════════════
+   DOTS
+════════════════════════════════════ */
+function buildDots() {
+  const c = document.getElementById('screenDots');
+  c.innerHTML = '';
+  SCREENS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === currentScreen ? ' active' : '') + (i < currentScreen ? ' done' : '');
+    c.appendChild(d);
+  });
+}
+
+/* ════════════════════════════════════
+   BUILD PICTURES
+════════════════════════════════════ */
+function buildPictures() {
+  const grid = document.getElementById('picGrid');
+  grid.innerHTML = '';
+  const pictures = SCREENS[currentScreen].pictures;
+
+  pictures.forEach((pic, pi) => {
+    const card = document.createElement('div');
+    card.className = 'pic-card';
+    card.dataset.pi = pi;
+
+    const drawing = document.createElement('div');
+    drawing.className = 'pic-drawing';
+    drawing.textContent = pic.emoji;
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'pic-name';
+    nameEl.textContent = pic.name;
+
+    const row = document.createElement('div');
+    row.className = 'drop-zone-row';
+
+    pic.letters.forEach((correctLetter, li) => {
+      totalSlots++;
+      const slot = document.createElement('div');
+      slot.className = 'drop-slot';
+      slot.dataset.pi = pi;
+      slot.dataset.li = li;
+      slot.dataset.correct = correctLetter.heb;
+      slot.dataset.filled = '0';
+      row.appendChild(slot);
+    });
+
+    card.appendChild(drawing);
+    card.appendChild(nameEl);
+    card.appendChild(row);
+
+    // ── כל הכרטיסייה היא אזור הגרירה ──
+    card.addEventListener('dragover', e => {
+      e.preventDefault();
+      if (!card.classList.contains('correct-all')) card.classList.add('card-hover');
+      const openSlot = getOpenSlot(pi);
+      if (openSlot) openSlot.classList.add('drag-over');
+    });
+    card.addEventListener('dragleave', e => {
+      if (!card.contains(e.relatedTarget)) {
+        card.classList.remove('card-hover');
+        card.querySelectorAll('.drop-slot').forEach(s => s.classList.remove('drag-over'));
+      }
+    });
+    card.addEventListener('drop', e => {
+      e.preventDefault();
+      card.classList.remove('card-hover');
+      card.querySelectorAll('.drop-slot').forEach(s => s.classList.remove('drag-over'));
+      const openSlot = getOpenSlot(pi);
+      if (openSlot) handleDrop(openSlot);
+    });
+
+    grid.appendChild(card);
+  });
+}
+
+/* ════════════════════════════════════
+   BUILD LETTERS
+════════════════════════════════════ */
+function buildLetters() {
+  const bank = document.getElementById('lettersBank');
+  bank.innerHTML = '';
+
+  allTiles.forEach((l, ti) => {
+    const tile = document.createElement('div');
+    tile.className = 'letter-tile';
+    tile.draggable = true;
+    tile.dataset.ti = ti;
+    tile.dataset.heb = l.heb;
+    tile.dataset.tileId = l.tileId;
+
+    tile.innerHTML = `<div class="tile-heb">${l.heb}</div><div class="tile-name">${l.name}</div>`;
+
+    tile.addEventListener('dragstart', e => {
+      dragLetter = l; dragTileEl = tile;
+      tile.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    tile.addEventListener('dragend', () => tile.classList.remove('dragging'));
+
+    tile.addEventListener('touchstart', e => {
+      dragLetter = l; dragTileEl = tile;
+      const g = document.getElementById('dragGhost');
+      g.textContent = l.heb; g.style.display = 'block';
+    }, {passive:true});
+
+    tile.addEventListener('touchmove', e => {
+      e.preventDefault();
+      const t = e.touches[0];
+      const g = document.getElementById('dragGhost');
+      g.style.left = t.clientX+'px'; g.style.top = t.clientY+'px';
+      // Highlight the card (and its open slot) under finger
+      document.querySelectorAll('.drop-slot').forEach(s => s.classList.remove('drag-over'));
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      const card = el?.closest('.pic-card');
+      if (card) {
+        const openSlot = getOpenSlot(card.dataset.pi);
+        if (openSlot) openSlot.classList.add('drag-over');
+      }
+    }, {passive:false});
+
+    tile.addEventListener('touchend', e => {
+      document.getElementById('dragGhost').style.display = 'none';
+      document.querySelectorAll('.drop-slot').forEach(s => s.classList.remove('drag-over'));
+      const t = e.changedTouches[0];
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      // Accept drop on the card anywhere OR directly on a slot
+      const card = el?.closest('.pic-card');
+      if (card) {
+        const openSlot = getOpenSlot(card.dataset.pi);
+        if (openSlot) handleDrop(openSlot);
+      }
+    }, {passive:false});
+
+    bank.appendChild(tile);
+  });
+}
+
+/* ════════════════════════════════════
+   GET FIRST OPEN SLOT IN A CARD
+════════════════════════════════════ */
+function getOpenSlot(pi) {
+  const slots = document.querySelectorAll(`.drop-slot[data-pi="${pi}"]`);
+  for (const s of slots) {
+    if (s.dataset.filled === '0') return s;
+  }
+  return null;
+}
+
+/* ════════════════════════════════════
+   HANDLE DROP
+════════════════════════════════════ */
+function handleDrop(slot) {
+  if (!dragLetter) return;
+  if (slot.dataset.filled === '1') return;
+
+  if (dragLetter.heb === slot.dataset.correct) {
+    // ✅ Correct
+    slot.dataset.filled = '1';
+    slot.classList.add('correct');
+    slot.textContent = dragLetter.heb;
+
+    const star = document.createElement('div');
+    star.className = 'star-badge';
+    star.textContent = '⭐';
+    slot.appendChild(star);
+
+    if (dragTileEl) dragTileEl.classList.add('used');
+
+    score += 15;
+    filledCorrect++;
+    updateScore();
+    updateProgress();
+    spawnConfetti(slot);
+    checkCardComplete(slot.dataset.pi);
+    speakWord(SCREENS[currentScreen].pictures[+slot.dataset.pi].name);
+
+    if (filledCorrect === totalSlots) {
+      setTimeout(showWin, 700);
+    }
+  } else {
+    // ❌ Wrong
+    slot.classList.add('wrong');
+    score = Math.max(0, score - 3);
+    updateScore();
+    setTimeout(() => slot.classList.remove('wrong'), 400);
+    speakBuzz();
+  }
+
+  dragLetter = null;
+  dragTileEl = null;
+}
+
+function checkCardComplete(pi) {
+  const slots = document.querySelectorAll(`.drop-slot[data-pi="${pi}"]`);
+  if ([...slots].every(s => s.dataset.filled === '1')) {
+    document.querySelector(`.pic-card[data-pi="${pi}"]`).classList.add('correct-all');
+  }
+}
+
+/* ════════════════════════════════════
+   SCORE / PROGRESS
+════════════════════════════════════ */
+function updateScore() {
+  document.getElementById('scoreNum').textContent = score;
+}
+function updateProgress() {
+  document.getElementById('progText').textContent = `${filledCorrect} / ${totalSlots}`;
+  const pct = totalSlots ? (filledCorrect/totalSlots*100) : 0;
+  document.getElementById('progFill').style.width = pct+'%';
+}
+
+/* ════════════════════════════════════
+   WIN SCREEN
+════════════════════════════════════ */
+function showWin() {
+  const screen = SCREENS[currentScreen];
+  const isLast = currentScreen === SCREENS.length - 1;
+  const stars = score >= totalSlots*15 ? '⭐⭐⭐' : score >= totalSlots*10 ? '⭐⭐' : '⭐';
+
+  document.getElementById('winCharacter').textContent = screen.character.emoji;
+  document.getElementById('winStars').textContent = stars;
+  document.getElementById('winTitle').textContent = isLast ? '🏆 סיימת הכל!' : `🎉 מסך ${currentScreen+1} הושלם!`;
+  document.getElementById('winSpeech').textContent = `"${screen.character.speech}"`;
+  document.getElementById('winMsg').textContent = isLast
+    ? `למדת את כל 22 האותיות! קיבלת ${score} נקודות!`
+    : `עברת למסך ${currentScreen+2}! המשך כך!`;
+  document.getElementById('btnContinue').textContent = isLast ? '🏆 סיום!' : `מסך ${currentScreen+2} ←`;
+
+  document.getElementById('winOverlay').classList.add('show');
+
+  for(let i=0;i<18;i++) setTimeout(spawnConfettiRandom, i*80);
+}
+
+function retryScreen() {
+  document.getElementById('winOverlay').classList.remove('show');
+  initScreen(currentScreen);
+}
+
+function nextScreen() {
+  document.getElementById('winOverlay').classList.remove('show');
+  if (currentScreen < SCREENS.length - 1) {
+    initScreen(currentScreen + 1);
+  } else {
+    showFinal();
+  }
+}
+
+/* ════════════════════════════════════
+   FINAL SCREEN
+════════════════════════════════════ */
+function showFinal() {
+  // Gather all letters from all screens
+  const allLetters = [];
+  SCREENS.forEach(s => s.pictures.forEach(p => {
+    p.letters.forEach(l => { if (!allLetters.find(x => x.heb===l.heb)) allLetters.push(l); });
+  }));
+
+  const container = document.getElementById('finalLetters');
+  container.innerHTML = '';
+  allLetters.forEach((l, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'final-letter-chip';
+    chip.textContent = l.heb;
+    chip.style.animationDelay = (i * 60) + 'ms';
+    chip.title = l.name;
+    container.appendChild(chip);
+  });
+
+  document.getElementById('finalOverlay').classList.add('show');
+  for(let i=0;i<25;i++) setTimeout(spawnConfettiRandom, i*100);
+}
+
+function restartAll() {
+  score = 0;
+  document.getElementById('finalOverlay').classList.remove('show');
+  initScreen(0);
+}
+
+/* ════════════════════════════════════
+   CONFETTI
+════════════════════════════════════ */
+function spawnConfetti(el) {
+  const emojis = ['⭐','🎉','✨','🌟','💛','🎊'];
+  const rect = el.getBoundingClientRect();
+  for(let i=0;i<5;i++) {
+    setTimeout(()=>{
+      const e = document.createElement('div');
+      e.className = 'confetti';
+      e.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      e.style.left = (rect.left + Math.random()*rect.width)+'px';
+      e.style.top  = (rect.top + window.scrollY)+'px';
+      document.body.appendChild(e);
+      setTimeout(()=>e.remove(), 1700);
+    }, i*55);
+  }
+}
+function spawnConfettiRandom() {
+  const emojis = ['⭐','🎉','✨','🌟','🦁','🐬','🎊','💛','💙','🏆'];
+  const e = document.createElement('div');
+  e.className = 'confetti';
+  e.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+  e.style.left = Math.random()*100+'vw';
+  e.style.top  = (20+Math.random()*60)+'vh';
+  document.body.appendChild(e);
+  setTimeout(()=>e.remove(), 1700);
+}
+
+/* ════════════════════════════════════
+   SOUND
+════════════════════════════════════ */
+function speakWord(text) {
+  try {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang='he-IL'; u.rate=0.8;
+    speechSynthesis.speak(u);
+  } catch(e){}
+}
+function speakBuzz() {
+  try {
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.connect(g); g.connect(ctx.destination);
+    osc.type='sawtooth'; osc.frequency.value=110;
+    g.gain.setValueAtTime(0.25, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.22);
+    osc.start(); osc.stop(ctx.currentTime+0.22);
+  } catch(e){}
+}
+
+/* ════════════════════════════════════
+   START
+════════════════════════════════════ */
+initScreen(0);
+</script>
+</body>
+</html>
