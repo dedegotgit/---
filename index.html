@@ -2,8 +2,79 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>אלף-בית הגיבורים 🦁</title>
+
+<!-- PWA Meta Tags -->
+<meta name="application-name" content="אלף-בית הגיבורים">
+<meta name="description" content="לומדים אלף-בית עברי עם ציורים ואותיות!">
+<meta name="theme-color" content="#ff8f00">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- Apple PWA -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="אלף-בית">
+
+<!-- Apple Touch Icon (generated inline as data URI) -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%23ff8f00'/><text y='110' x='90' text-anchor='middle' font-size='110'>🦁</text><text y='165' x='90' text-anchor='middle' font-size='28' fill='white' font-family='Arial'>אלף-בית</text></svg>">
+
+<!-- PWA Manifest (inline) -->
+<link rel="manifest" href="data:application/json,{
+  %22name%22:%22אלף-בית הגיבורים%22,
+  %22short_name%22:%22אלף-בית%22,
+  %22description%22:%22לומדים עברית עם ציורים%22,
+  %22start_url%22:%22./%22,
+  %22display%22:%22standalone%22,
+  %22background_color%22:%22%23fff9f0%22,
+  %22theme_color%22:%22%23ff8f00%22,
+  %22orientation%22:%22portrait%22,
+  %22icons%22:[{%22src%22:%22data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%23ff8f00'/><text y='340' x='256' text-anchor='middle' font-size='320'>🦁</text></svg>%22,%22sizes%22:%22512x512%22,%22type%22:%22image/svg+xml%22}]
+}">
+
+<!-- Splash screen color -->
+<style>
+  /* Safe area for notch phones */
+  body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+
+  /* Splash screen shown before app loads */
+  #splash {
+    position: fixed; inset: 0; z-index: 9999;
+    background: linear-gradient(135deg, #ff8f00, #e65100);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 16px;
+    transition: opacity 0.5s ease;
+  }
+  #splash.hide { opacity: 0; pointer-events: none; }
+  .splash-emoji { font-size: 6rem; animation: splashBounce 0.8s ease-out; }
+  .splash-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.2rem; color: white;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    animation: splashBounce 0.8s 0.15s ease-out both;
+  }
+  .splash-sub {
+    font-size: 1rem; color: rgba(255,255,255,0.85);
+    animation: splashBounce 0.8s 0.3s ease-out both;
+  }
+  .splash-dots { display: flex; gap: 8px; margin-top: 10px; }
+  .splash-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    animation: dotPulse 1.2s infinite;
+  }
+  .splash-dot:nth-child(2) { animation-delay: 0.2s; }
+  .splash-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes splashBounce {
+    0%   { transform: translateY(30px); opacity: 0; }
+    100% { transform: translateY(0);    opacity: 1; }
+  }
+  @keyframes dotPulse {
+    0%,100% { background: rgba(255,255,255,0.3); transform: scale(1); }
+    50%      { background: rgba(255,255,255,0.9); transform: scale(1.3); }
+  }
+</style>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Varela+Round&display=swap');
 
@@ -470,6 +541,18 @@ body.theme-2 .panel-title { color: #01579b; }
 </style>
 </head>
 <body class="theme-1">
+
+<!-- Splash Screen -->
+<div id="splash">
+  <div class="splash-emoji">🦁</div>
+  <div class="splash-title">אלף-בית הגיבורים</div>
+  <div class="splash-sub">לומדים עברית עם ציורים ואותיות!</div>
+  <div class="splash-dots">
+    <div class="splash-dot"></div>
+    <div class="splash-dot"></div>
+    <div class="splash-dot"></div>
+  </div>
+</div>
 
 <header>
   <div class="logo-text" id="headerLogo">🦁 אלף-בית הגיבורים</div>
@@ -1052,6 +1135,49 @@ function speakBuzz() {
    START
 ════════════════════════════════════ */
 initScreen(0);
+
+// Hide splash screen after app loads
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const splash = document.getElementById('splash');
+    if (splash) {
+      splash.classList.add('hide');
+      setTimeout(() => splash.remove(), 500);
+    }
+  }, 1200);
+});
+
+// Register Service Worker for offline support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    // Inline service worker as blob
+    const swCode = `
+      const CACHE = 'aleph-bet-v1';
+      self.addEventListener('install', e => {
+        e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/---/', '/---/index.html'])));
+        self.skipWaiting();
+      });
+      self.addEventListener('activate', e => {
+        e.waitUntil(caches.keys().then(keys =>
+          Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+        ));
+        self.clients.claim();
+      });
+      self.addEventListener('fetch', e => {
+        e.respondWith(
+          caches.match(e.request).then(r => r || fetch(e.request).then(res => {
+            const clone = res.clone();
+            caches.open(CACHE).then(c => c.put(e.request, clone));
+            return res;
+          }))
+        );
+      });
+    `;
+    const blob = new Blob([swCode], {type: 'application/javascript'});
+    const swUrl = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swUrl).catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
