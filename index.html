@@ -379,61 +379,90 @@ body.theme-2 .panel-title { color: #01579b; }
 
 /* ── RESPONSIVE / MOBILE ── */
 @media (max-width: 680px) {
-  .divider { display: none; }
   .win-box { padding: 22px 22px 26px; }
   .win-title { font-size: 1.7rem; }
 
-  body { overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+  /* Full screen, no scroll on body */
+  html, body {
+    height: 100%; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
 
-  header { flex-shrink: 0; }
-  .screen-dots { flex-shrink: 0; padding: 4px 0; }
-  .mobile-tip { flex-shrink: 0; }
-  .progress-wrap { flex-shrink: 0; margin: 4px auto; }
+  header { flex-shrink: 0; padding: 10px 14px 8px; }
+  .logo-text { font-size: 1.1rem; }
+  .chip { padding: 4px 10px; font-size: 0.8rem; }
 
-  /* arena takes remaining space, split 60/40 */
+  .screen-dots { flex-shrink: 0; padding: 3px 0; }
+  .mobile-tip  { flex-shrink: 0; font-size: 0.78rem; padding: 2px 10px; }
+  .desktop-tip { display: none; }
+  .progress-wrap { flex-shrink: 0; margin: 3px auto; padding: 0 10px; }
+  .prog-bar-bg { height: 8px; }
+
+  /* Divider hidden */
+  .divider { display: none; }
+
+  /* Arena = side by side, fills remaining height */
   .arena {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    align-items: stretch;
     flex: 1;
     overflow: hidden;
-    padding: 6px 10px 0;
-    gap: 0;
+    padding: 4px 6px 4px;
+    gap: 6px;
     min-height: 0;
   }
 
-  /* pictures panel: scrollable, takes ~58% */
+  /* Pictures panel — right column, scrollable */
   .pictures-panel {
-    flex: 0 0 58%;
+    grid-column: 2;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    border-radius: 16px;
-    padding: 8px 8px 8px;
-    margin-bottom: 6px;
+    border-radius: 14px;
+    padding: 8px 6px;
     min-height: 0;
+    height: 100%;
   }
-  .pictures-panel .panel-title { font-size: 0.85rem; margin-bottom: 6px; }
+  .pictures-panel .panel-title { font-size: 0.8rem; margin-bottom: 6px; }
 
-  /* letters panel: fixed height at bottom, scrollable inside */
+  .pic-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .pic-card {
+    min-height: 90px;
+    padding: 6px 4px 4px;
+    border-radius: 14px;
+    gap: 2px;
+  }
+  .pic-drawing { font-size: 2.6rem; }
+  .pic-name    { font-size: 0.75rem; }
+  .drop-slot   { width: 34px; height: 34px; font-size: 1.2rem; border-radius: 8px; }
+
+  /* Letters panel — left column, scrollable */
   .letters-panel {
-    flex: 0 0 38%;
+    grid-column: 1;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    border-radius: 16px 16px 0 0;
-    padding: 8px 8px 12px;
+    border-radius: 14px;
+    padding: 8px 5px;
     min-height: 0;
+    height: 100%;
   }
-  .letters-panel .panel-title { font-size: 0.85rem; margin-bottom: 6px; }
+  .letters-panel .panel-title { font-size: 0.8rem; margin-bottom: 6px; }
 
-  .letters-bank { grid-template-columns: repeat(5,1fr); gap: 5px; }
-  .letter-tile  { padding: 5px 2px 4px; border-radius: 10px; }
-  .tile-heb     { font-size: 1.35rem; }
-  .tile-name    { font-size: 0.45rem; }
-
-  .pic-grid     { grid-template-columns: repeat(3,1fr); gap: 6px; }
-  .pic-card     { min-height: 75px; padding: 4px 3px 3px; }
-  .pic-drawing  { font-size: 1.9rem; }
-  .pic-name     { font-size: 0.68rem; }
-  .drop-slot    { width: 28px; height: 28px; font-size: 1rem; border-radius: 7px; }
+  .letters-bank {
+    grid-template-columns: 1fr 1fr;   /* 2 wide columns */
+    gap: 6px;
+  }
+  .letter-tile {
+    padding: 10px 4px 8px;
+    border-radius: 12px;
+    min-height: 62px;
+  }
+  .tile-heb  { font-size: 2rem; }
+  .tile-name { font-size: 0.55rem; }
 }
 </style>
 </head>
