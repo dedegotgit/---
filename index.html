@@ -412,17 +412,19 @@ body.theme-2 .panel-title { color: #01579b; }
     padding: 4px 6px 4px;
     gap: 6px;
     min-height: 0;
+    direction: ltr;   /* force LTR so column 1=left, column 2=right */
   }
 
-  /* Pictures panel — right column, scrollable */
+  /* Pictures panel — right side (column 2 in LTR = right in RTL page) */
   .pictures-panel {
-    grid-column: 2;
+    grid-column: 1;   /* visually RIGHT because arena is LTR */
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     border-radius: 14px;
     padding: 8px 6px;
     min-height: 0;
     height: 100%;
+    direction: rtl;  /* content stays RTL inside */
   }
   .pictures-panel .panel-title { font-size: 0.8rem; margin-bottom: 6px; }
 
@@ -440,15 +442,16 @@ body.theme-2 .panel-title { color: #01579b; }
   .pic-name    { font-size: 0.75rem; }
   .drop-slot   { width: 34px; height: 34px; font-size: 1.2rem; border-radius: 8px; }
 
-  /* Letters panel — left column, scrollable */
+  /* Letters panel — left side (column 2 in LTR = left in RTL page) */
   .letters-panel {
-    grid-column: 1;
+    grid-column: 2;   /* visually LEFT because arena is LTR */
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     border-radius: 14px;
     padding: 8px 5px;
     min-height: 0;
     height: 100%;
+    direction: rtl;  /* content stays RTL inside */
   }
   .letters-panel .panel-title { font-size: 0.8rem; margin-bottom: 6px; }
 
